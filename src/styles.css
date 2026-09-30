@@ -133,13 +133,58 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+@theme {
+  --font-sans: "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-serif: "GFS Didot", "Palatino Linotype", "Book Antiqua", Palatino, "Noto Serif", Georgia,
+    serif;
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
+
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .nav-link[data-active="true"] {
+    color: var(--color-foreground);
+    border-bottom: 1px solid var(--color-accent);
+    padding-bottom: 2px;
+  }
+}
+
