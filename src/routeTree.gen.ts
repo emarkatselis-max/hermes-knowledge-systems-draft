@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AporritoRouteImport } from './routes/aporrito'
+import { Route as EpikoinoniaRouteImport } from './routes/epikoinonia'
+import { Route as ErgaEkdoseisRouteImport } from './routes/erga-ekdoseis'
+import { Route as EtaireiaRouteImport } from './routes/etaireia'
+import { Route as EtairikaStoixeiaRouteImport } from './routes/etairika-stoixeia'
+import { Route as YpiresiesRouteImport } from './routes/ypiresies'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AporritoRoute = AporritoRouteImport.update({
+  id: '/aporrito',
+  path: '/aporrito',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EpikoinoniaRoute = EpikoinoniaRouteImport.update({
+  id: '/epikoinonia',
+  path: '/epikoinonia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErgaEkdoseisRoute = ErgaEkdoseisRouteImport.update({
+  id: '/erga-ekdoseis',
+  path: '/erga-ekdoseis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EtaireiaRoute = EtaireiaRouteImport.update({
+  id: '/etaireia',
+  path: '/etaireia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EtairikaStoixeiaRoute = EtairikaStoixeiaRouteImport.update({
+  id: '/etairika-stoixeia',
+  path: '/etairika-stoixeia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const YpiresiesRoute = YpiresiesRouteImport.update({
+  id: '/ypiresies',
+  path: '/ypiresies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aporrito': typeof AporritoRoute
+  '/epikoinonia': typeof EpikoinoniaRoute
+  '/erga-ekdoseis': typeof ErgaEkdoseisRoute
+  '/etaireia': typeof EtaireiaRoute
+  '/etairika-stoixeia': typeof EtairikaStoixeiaRoute
+  '/ypiresies': typeof YpiresiesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aporrito': typeof AporritoRoute
+  '/epikoinonia': typeof EpikoinoniaRoute
+  '/erga-ekdoseis': typeof ErgaEkdoseisRoute
+  '/etaireia': typeof EtaireiaRoute
+  '/etairika-stoixeia': typeof EtairikaStoixeiaRoute
+  '/ypiresies': typeof YpiresiesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aporrito': typeof AporritoRoute
+  '/epikoinonia': typeof EpikoinoniaRoute
+  '/erga-ekdoseis': typeof ErgaEkdoseisRoute
+  '/etaireia': typeof EtaireiaRoute
+  '/etairika-stoixeia': typeof EtairikaStoixeiaRoute
+  '/ypiresies': typeof YpiresiesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/aporrito'
+    | '/epikoinonia'
+    | '/erga-ekdoseis'
+    | '/etaireia'
+    | '/etairika-stoixeia'
+    | '/ypiresies'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/aporrito'
+    | '/epikoinonia'
+    | '/erga-ekdoseis'
+    | '/etaireia'
+    | '/etairika-stoixeia'
+    | '/ypiresies'
+  id:
+    | '__root__'
+    | '/'
+    | '/aporrito'
+    | '/epikoinonia'
+    | '/erga-ekdoseis'
+    | '/etaireia'
+    | '/etairika-stoixeia'
+    | '/ypiresies'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AporritoRoute: typeof AporritoRoute
+  EpikoinoniaRoute: typeof EpikoinoniaRoute
+  ErgaEkdoseisRoute: typeof ErgaEkdoseisRoute
+  EtaireiaRoute: typeof EtaireiaRoute
+  EtairikaStoixeiaRoute: typeof EtairikaStoixeiaRoute
+  YpiresiesRoute: typeof YpiresiesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aporrito': {
+      id: '/aporrito'
+      path: '/aporrito'
+      fullPath: '/aporrito'
+      preLoaderRoute: typeof AporritoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/epikoinonia': {
+      id: '/epikoinonia'
+      path: '/epikoinonia'
+      fullPath: '/epikoinonia'
+      preLoaderRoute: typeof EpikoinoniaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/erga-ekdoseis': {
+      id: '/erga-ekdoseis'
+      path: '/erga-ekdoseis'
+      fullPath: '/erga-ekdoseis'
+      preLoaderRoute: typeof ErgaEkdoseisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/etaireia': {
+      id: '/etaireia'
+      path: '/etaireia'
+      fullPath: '/etaireia'
+      preLoaderRoute: typeof EtaireiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/etairika-stoixeia': {
+      id: '/etairika-stoixeia'
+      path: '/etairika-stoixeia'
+      fullPath: '/etairika-stoixeia'
+      preLoaderRoute: typeof EtairikaStoixeiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ypiresies': {
+      id: '/ypiresies'
+      path: '/ypiresies'
+      fullPath: '/ypiresies'
+      preLoaderRoute: typeof YpiresiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AporritoRoute: AporritoRoute,
+  EpikoinoniaRoute: EpikoinoniaRoute,
+  ErgaEkdoseisRoute: ErgaEkdoseisRoute,
+  EtaireiaRoute: EtaireiaRoute,
+  EtairikaStoixeiaRoute: EtairikaStoixeiaRoute,
+  YpiresiesRoute: YpiresiesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
