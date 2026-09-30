@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ErgaEkdoseisRouteImport } from './routes/erga-ekdoseis'
+import { Route as EtaireiaRouteImport } from './routes/etaireia'
+import { Route as YpiresiesRouteImport } from './routes/ypiresies'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ErgaEkdoseisRoute = ErgaEkdoseisRouteImport.update({
+  id: '/erga-ekdoseis',
+  path: '/erga-ekdoseis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EtaireiaRoute = EtaireiaRouteImport.update({
+  id: '/etaireia',
+  path: '/etaireia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const YpiresiesRoute = YpiresiesRouteImport.update({
+  id: '/ypiresies',
+  path: '/ypiresies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/erga-ekdoseis': typeof ErgaEkdoseisRoute
+  '/etaireia': typeof EtaireiaRoute
+  '/ypiresies': typeof YpiresiesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/erga-ekdoseis': typeof ErgaEkdoseisRoute
+  '/etaireia': typeof EtaireiaRoute
+  '/ypiresies': typeof YpiresiesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/erga-ekdoseis': typeof ErgaEkdoseisRoute
+  '/etaireia': typeof EtaireiaRoute
+  '/ypiresies': typeof YpiresiesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/erga-ekdoseis' | '/etaireia' | '/ypiresies'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/erga-ekdoseis' | '/etaireia' | '/ypiresies'
+  id: '__root__' | '/' | '/erga-ekdoseis' | '/etaireia' | '/ypiresies'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ErgaEkdoseisRoute: typeof ErgaEkdoseisRoute
+  EtaireiaRoute: typeof EtaireiaRoute
+  YpiresiesRoute: typeof YpiresiesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/erga-ekdoseis': {
+      id: '/erga-ekdoseis'
+      path: '/erga-ekdoseis'
+      fullPath: '/erga-ekdoseis'
+      preLoaderRoute: typeof ErgaEkdoseisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/etaireia': {
+      id: '/etaireia'
+      path: '/etaireia'
+      fullPath: '/etaireia'
+      preLoaderRoute: typeof EtaireiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ypiresies': {
+      id: '/ypiresies'
+      path: '/ypiresies'
+      fullPath: '/ypiresies'
+      preLoaderRoute: typeof YpiresiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ErgaEkdoseisRoute: ErgaEkdoseisRoute,
+  EtaireiaRoute: EtaireiaRoute,
+  YpiresiesRoute: YpiresiesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
