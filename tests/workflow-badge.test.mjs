@@ -27,12 +27,29 @@ function readFileOrEmpty(relPath) {
 
 // Καθαροί εξαγωγείς/ελέγχοι στοιχείων badge — δέχονται το κείμενο ως όρισμα,
 // ώστε να επαναχρησιμοποιούνται και σε μεταλλαγμένα (αρνητικά) README.
+// Πλήρης δομή badge Markdown: [![alt](URL εικόνας)](URL συνδέσμου).
+const BADGE_MARKDOWN_RE =
+  /\[!\[[^\]]*\]\((https:\/\/github\.com\/[^\s)]*badge\.svg[^)\s]*)\)\]\((https:\/\/github\.com\/[^)\s]+)\)/;
+function parseBadge(text) {
+  const m = text.match(BADGE_MARKDOWN_RE);
+  return m ? { image: m[1], link: m[2] } : null;
+}
+// Σε README με πολλά badge, προτιμάται το URL που αναφέρεται σε αυτό το workflow.
+function badgeImageUrls(text) {
+  return [...text.matchAll(/https:\/\/github\.com\/[^)\s]+\/badge\.svg/g)].map((m) => m[0]);
+}
 function badgeImageUrl(text) {
-  return text.match(/https:\/\/github\.com\/[^)\s]+\/badge\.svg/)?.[0] ?? "";
+  const urls = badgeImageUrls(text);
+  return urls.find((u) => u.includes(WORKFLOW_FILE)) ?? urls[0] ?? "";
+}
+function badgeLinkUrls(text) {
+  return [...text.matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)]
+    .map((m) => m[1])
+    .filter((u) => !u.includes("badge.svg"));
 }
 function badgeLinkUrl(text) {
-  const urls = [...text.matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)].map((m) => m[1]);
-  return urls.find((u) => !u.includes("badge.svg")) ?? "";
+  const urls = badgeLinkUrls(text);
+  return urls.find((u) => u.includes(WORKFLOW_FILE)) ?? urls[0] ?? "";
 }
 function badgeIndex(text) {
   return text.indexOf("badge.svg");
