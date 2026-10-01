@@ -28,7 +28,8 @@ function badgeImageUrl() {
   return readme.match(/https:\/\/github\.com\/[^)\s]+\/badge\.svg/)?.[0] ?? "";
 }
 function badgeLinkUrl() {
-  return readme.match(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/)?.[1] ?? "";
+  const urls = [...readme.matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)].map((m) => m[1]);
+  return urls.find((u) => !u.endsWith("/badge.svg")) ?? "";
 }
 function badgeIndex() {
   return readme.indexOf("badge.svg");
