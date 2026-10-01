@@ -3,6 +3,7 @@
 import { accessSync, constants, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { maskFencedCodeBlocks, findWorkflowBadges } from "../src/lib/readme-badges.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const WORKFLOW_PATH = ".github/workflows/hermes_ci_matrix_workflow.yml";
@@ -31,19 +32,19 @@ function readFileOrEmpty(relPath) {
 const BADGE_MARKDOWN_RE =
   /\[!\[[^\]]*\]\((https:\/\/github\.com\/[^\s)]*badge\.svg[^)\s]*)\)\]\((https:\/\/github\.com\/[^)\s]+)\)/;
 function parseBadge(text) {
-  const m = text.match(BADGE_MARKDOWN_RE);
+  const m = maskFencedCodeBlocks(text).match(BADGE_MARKDOWN_RE);
   return m ? { image: m[1], link: m[2] } : null;
 }
 // Σε README με πολλά badge, προτιμάται το URL που αναφέρεται σε αυτό το workflow.
 function badgeImageUrls(text) {
-  return [...text.matchAll(/https:\/\/github\.com\/[^)\s]+\/badge\.svg/g)].map((m) => m[0]);
+  return [...maskFencedCodeBlocks(text).matchAll(/https:\/\/github\.com\/[^)\s]+\/badge\.svg/g)].map((m) => m[0]);
 }
 function badgeImageUrl(text) {
   const urls = badgeImageUrls(text);
   return urls.find((u) => u.includes(WORKFLOW_FILE)) ?? urls[0] ?? "";
 }
 function badgeLinkUrls(text) {
-  return [...text.matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)]
+  return [...maskFencedCodeBlocks(text).matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)]
     .map((m) => m[1])
     .filter((u) => !u.includes("badge.svg"));
 }
@@ -52,10 +53,10 @@ function badgeLinkUrl(text) {
   return urls.find((u) => u.includes(WORKFLOW_FILE)) ?? urls[0] ?? "";
 }
 function badgeIndex(text) {
-  return text.indexOf("badge.svg");
+  return maskFencedCodeBlocks(text).indexOf("badge.svg");
 }
 function firstHeadingIndex(text) {
-  return text.search(/^# /m);
+  return maskFencedCodeBlocks(text).search(/^# /m);
 }
 function hasWorkflowTrigger(workflow, trigger) {
   return new RegExp(`^ {2}${trigger}:`, "m").test(workflow);
@@ -356,6 +357,44 @@ negative(
   breakLinkParens(readme),
   ({ results }) => assertParseFailure(results),
 );
+
+// Η. Badge μέσα σε fenced code block δεν εκλαμβάνονται ως πραγματικά badge.
+const FENCED_WRONG_BADGE =
+  "```markdown\n[![Other CI](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml)\n```\n";
+const TILDE_FENCED_BADGE =
+  "~~~\n[![Example](https://github.com/OWNER/REPO/actions/workflows/example.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/example.yml)\n~~~\n";
+positive("fenced code: badge άλλου workflow μέσα σε ``` πριν από το σωστό αγνοείται", FENCED_WRONG_BADGE + readme);
+positive("fenced code: badge μέσα σε ~~~ πριν από το σωστό αγνοείται", TILDE_FENCED_BADGE + readme);
+{
+  const found = findWorkflowBadges(FENCED_WRONG_BADGE + TILDE_FENCED_BADGE);
+  check(
+    "fenced code: README με badge μόνο μέσα σε code blocks δεν έχει πραγματικό badge",
+    found.length === 0 && badgeImageUrl(FENCED_WRONG_BADGE) === "" && parseBadge(FENCED_WRONG_BADGE) === null,
+    `κανένα badge εκτός code blocks — βρέθηκαν ${found.length} (το badge μέσα σε fenced code block εκλήφθηκε ως πραγματικό)`,
+  );
+  const onlyFenced = "```\n" + readme + "\n```\n";
+  const parse = resultByLabel(runChecks(onlyFenced), PARSE_CHECK_LABEL);
+  check(
+    "fenced code: όταν το μόνο badge είναι μέσα σε code block, ο έλεγχος σύνταξης αποτυγχάνει",
+    parse && !parse.ok,
+    "αποτυχία του ελέγχου σύνταξης όταν το badge υπάρχει μόνο μέσα σε fenced code block",
+  );
+  const mixed = findWorkflowBadges(FENCED_WRONG_BADGE + readme);
+  const real = mixed.find((b) => b.workflow === WORKFLOW_FILE);
+  check(
+    "fenced code: εντοπίζεται το σωστό workflow badge στο κανονικό περιεχόμενο",
+    mixed.length >= 1 && mixed.every((b) => b.workflow !== "other_workflow.yml") && real?.wellFormed === true &&
+      real.line > FENCED_WRONG_BADGE.split("\n").length - 1,
+    `το badge του ${WORKFLOW_FILE} στο κανονικό περιεχόμενο (εκτός code block), με αναλύσιμη σύνταξη`,
+  );
+  const masked = maskFencedCodeBlocks(FENCED_WRONG_BADGE + readme);
+  check(
+    "fenced code: η απόκρυψη code blocks διατηρεί μήκος και γραμμές",
+    masked.length === (FENCED_WRONG_BADGE + readme).length &&
+      masked.split("\n").length === (FENCED_WRONG_BADGE + readme).split("\n").length,
+    "ίδιο μήκος κειμένου και ίδιος αριθμός γραμμών μετά την απόκρυψη των code blocks",
+  );
+}
 
 if (failures > 0) {
   console.error(`\n${failures} δοκιμή(ές) απέτυχαν — βλ. «Λείπει:» πάνω από κάθε αποτυχία.`);

@@ -16,6 +16,7 @@ import { Route as ErgaEkdoseisRouteImport } from './routes/erga-ekdoseis'
 import { Route as EtaireiaRouteImport } from './routes/etaireia'
 import { Route as EtairikaStoixeiaRouteImport } from './routes/etairika-stoixeia'
 import { Route as YpiresiesRouteImport } from './routes/ypiresies'
+import { Route as ErgaleiaElegxosReadmeRouteImport } from './routes/ergaleia.elegxos-readme'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const YpiresiesRoute = YpiresiesRouteImport.update({
   path: '/ypiresies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ErgaleiaElegxosReadmeRoute = ErgaleiaElegxosReadmeRouteImport.update({
+  id: '/ergaleia/elegxos-readme',
+  path: '/ergaleia/elegxos-readme',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/etaireia': typeof EtaireiaRoute
   '/etairika-stoixeia': typeof EtairikaStoixeiaRoute
   '/ypiresies': typeof YpiresiesRoute
+  '/ergaleia/elegxos-readme': typeof ErgaleiaElegxosReadmeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/etaireia': typeof EtaireiaRoute
   '/etairika-stoixeia': typeof EtairikaStoixeiaRoute
   '/ypiresies': typeof YpiresiesRoute
+  '/ergaleia/elegxos-readme': typeof ErgaleiaElegxosReadmeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/etaireia': typeof EtaireiaRoute
   '/etairika-stoixeia': typeof EtairikaStoixeiaRoute
   '/ypiresies': typeof YpiresiesRoute
+  '/ergaleia/elegxos-readme': typeof ErgaleiaElegxosReadmeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/etaireia'
     | '/etairika-stoixeia'
     | '/ypiresies'
+    | '/ergaleia/elegxos-readme'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/etaireia'
     | '/etairika-stoixeia'
     | '/ypiresies'
+    | '/ergaleia/elegxos-readme'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/etaireia'
     | '/etairika-stoixeia'
     | '/ypiresies'
+    | '/ergaleia/elegxos-readme'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   EtaireiaRoute: typeof EtaireiaRoute
   EtairikaStoixeiaRoute: typeof EtairikaStoixeiaRoute
   YpiresiesRoute: typeof YpiresiesRoute
+  ErgaleiaElegxosReadmeRoute: typeof ErgaleiaElegxosReadmeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YpiresiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ergaleia/elegxos-readme': {
+      id: '/ergaleia/elegxos-readme'
+      path: '/ergaleia/elegxos-readme'
+      fullPath: '/ergaleia/elegxos-readme'
+      preLoaderRoute: typeof ErgaleiaElegxosReadmeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   EtaireiaRoute: EtaireiaRoute,
   EtairikaStoixeiaRoute: EtairikaStoixeiaRoute,
   YpiresiesRoute: YpiresiesRoute,
+  ErgaleiaElegxosReadmeRoute: ErgaleiaElegxosReadmeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
