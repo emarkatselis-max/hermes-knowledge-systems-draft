@@ -44,6 +44,16 @@ check(
   /name: Cross-Platform Matrix Summary/.test(workflow),
 );
 
+// 6. Οι οδηγίες του README αναφέρουν το main και το Cross-Platform Matrix Summary ως required status check.
+check(
+  "το README αναφέρει required status check για το main",
+  /[Rr]equired status check/.test(readme) && /`main`/.test(readme),
+);
+check(
+  "το README αναφέρει το «Cross-Platform Matrix Summary» ως required check",
+  /Cross-Platform Matrix Summary/.test(readme),
+);
+
 if (failures > 0) {
   console.error(`\n${failures} δοκιμή(ές) απέτυχαν.`);
   process.exit(1);
