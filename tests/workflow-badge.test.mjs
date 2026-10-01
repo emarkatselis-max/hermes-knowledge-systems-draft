@@ -54,6 +54,18 @@ check(
   /Cross-Platform Matrix Summary/.test(readme),
 );
 
+// 8. Το README επισημαίνει το OWNER/REPO ως προσωρινό placeholder.
+check(
+  "το README επισημαίνει το OWNER/REPO ως προσωρινό placeholder",
+  /OWNER\/REPO/.test(readme) && /προσωριν[οό]/i.test(readme),
+);
+
+// 9. Το README εξηγεί ότι το placeholder πρέπει να αντικατασταθεί με την πραγματική διαδρομή αποθετηρίου.
+check(
+  "το README εξηγεί την αντικατάσταση του placeholder με την πραγματική διαδρομή",
+  /αντικαταστ/.test(readme) && /(πραγματικ[οό]|μονοπάτι αποθετηρίου)/.test(readme),
+);
+
 if (failures > 0) {
   console.error(`\n${failures} δοκιμή(ές) απέτυχαν.`);
   process.exit(1);
