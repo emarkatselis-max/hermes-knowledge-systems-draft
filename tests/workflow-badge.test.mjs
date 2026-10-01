@@ -305,6 +305,58 @@ check(
   "διακριτά μηνύματα: το μήνυμα εικόνας αναφέρει badge.svg, το μήνυμα συνδέσμου όχι",
 );
 
+// Στ. README με περισσότερα από ένα badge: οι έλεγχοι εντοπίζουν το σωστό workflow badge.
+const SHIELDS_BADGE =
+  "[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)\n";
+const OTHER_WORKFLOW_BADGE =
+  "[![Other CI](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml)\n";
+function positive(label, mutatedReadme) {
+  const results = runChecks(mutatedReadme);
+  const failed = results.filter((r) => !r.ok);
+  check(
+    label,
+    failed.length === 0,
+    failed.length ? `οι έλεγχοι που απέτυχαν άδικα: ${failed.map((f) => f.label).join(", ")}` : "",
+  );
+}
+positive(
+  "πολλαπλά badge: εξωτερικό badge (shields.io) πριν από το workflow badge δεν μπερδεύει τους ελέγχους",
+  SHIELDS_BADGE + readme,
+);
+positive(
+  "πολλαπλά badge: badge άλλου workflow πριν από το σωστό δεν μπερδεύει τους ελέγχους",
+  OTHER_WORKFLOW_BADGE + readme,
+);
+
+// Ζ. Κακοσχηματισμένη σύνταξη Markdown στο badge: αποτυχία στον έλεγχο σύνταξης
+// με μήνυμα που κατονομάζει το στοιχείο badge που δεν μπόρεσε να αναλυθεί.
+const PARSE_CHECK_LABEL = "η σύνταξη Markdown του badge είναι αναλύσιμη";
+function breakImageParens(text) {
+  // Λείπει το `)]` που κλείνει την εικόνα: [![alt](img](link)
+  return text.replace(BADGE_MARKDOWN_RE, (_, img, link) => `[![HERMES CI Matrix](${img}](${link})`);
+}
+function breakLinkParens(text) {
+  // Λείπει η τελική `)` του συνδέσμου: [![alt](img)](link
+  return text.replace(BADGE_MARKDOWN_RE, (_, img, link) => `[![HERMES CI Matrix](${img})](${link}`);
+}
+function assertParseFailure(results) {
+  const parse = resultByLabel(results, PARSE_CHECK_LABEL);
+  if (!parse || parse.ok) return "ο έλεγχος σύνταξης δεν απέτυχε παρότι η σύνταξη Markdown του badge είναι κακοσχηματισμένη";
+  if (!/badge/.test(parse.hint)) return "το μήνυμα αποτυχίας δεν κατονομάζει το στοιχείο badge που δεν αναλύεται";
+  if (!/σύνταξη|αναλυθεί/.test(parse.hint)) return "το μήνυμα αποτυχίας δεν εξηγεί ότι η σύνταξη του badge δεν μπόρεσε να αναλυθεί";
+  return true;
+}
+negative(
+  "αρνητικό: κακοσχηματισμένη σύνταξη εικόνας badge (λείπει `)]`) αποτυγχάνει με μήνυμα που κατονομάζει το badge",
+  breakImageParens(readme),
+  ({ results }) => assertParseFailure(results),
+);
+negative(
+  "αρνητικό: κακοσχηματισμένη σύνταξη συνδέσμου badge (λείπει τελική `)`) αποτυγχάνει με μήνυμα που κατονομάζει το badge",
+  breakLinkParens(readme),
+  ({ results }) => assertParseFailure(results),
+);
+
 if (failures > 0) {
   console.error(`\n${failures} δοκιμή(ές) απέτυχαν — βλ. «Λείπει:» πάνω από κάθε αποτυχία.`);
   process.exit(1);
