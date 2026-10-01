@@ -29,7 +29,7 @@ function badgeImageUrl() {
 }
 function badgeLinkUrl() {
   const urls = [...readme.matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)].map((m) => m[1]);
-  return urls.find((u) => !u.endsWith("/badge.svg")) ?? "";
+  return urls.find((u) => !u.includes("badge.svg")) ?? "";
 }
 function badgeIndex() {
   return readme.indexOf("badge.svg");
