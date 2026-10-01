@@ -1,6 +1,8 @@
 <!-- Αντικαταστήστε OWNER/REPO με το πραγματικό μονοπάτι αποθετηρίου GitHub (π.χ. myorg/hermes-site) μόλις συνδεθεί το project. -->
 [![HERMES CI Matrix](https://github.com/OWNER/REPO/actions/workflows/hermes_ci_matrix_workflow.yml/badge.svg?branch=main)](https://github.com/OWNER/REPO/actions/workflows/hermes_ci_matrix_workflow.yml)
 
+> **Σημείωση:** Το `OWNER/REPO` στο badge είναι προσωρινό και πρέπει να αντικατασταθεί με το πραγματικό μονοπάτι αποθετηρίου (π.χ. `myorg/hermes-site`) μόλις η διαδρομή γίνει διαθέσιμη — μέχρι τότε το badge δεν δείχνει πραγματική κατάσταση.
+
 # Welcome to your Lovable project
 
 ## CI: Required status check στο main
