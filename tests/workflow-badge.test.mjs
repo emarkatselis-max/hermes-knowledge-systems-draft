@@ -27,12 +27,29 @@ function readFileOrEmpty(relPath) {
 
 // Καθαροί εξαγωγείς/ελέγχοι στοιχείων badge — δέχονται το κείμενο ως όρισμα,
 // ώστε να επαναχρησιμοποιούνται και σε μεταλλαγμένα (αρνητικά) README.
+// Πλήρης δομή badge Markdown: [![alt](URL εικόνας)](URL συνδέσμου).
+const BADGE_MARKDOWN_RE =
+  /\[!\[[^\]]*\]\((https:\/\/github\.com\/[^\s)]*badge\.svg[^)\s]*)\)\]\((https:\/\/github\.com\/[^)\s]+)\)/;
+function parseBadge(text) {
+  const m = text.match(BADGE_MARKDOWN_RE);
+  return m ? { image: m[1], link: m[2] } : null;
+}
+// Σε README με πολλά badge, προτιμάται το URL που αναφέρεται σε αυτό το workflow.
+function badgeImageUrls(text) {
+  return [...text.matchAll(/https:\/\/github\.com\/[^)\s]+\/badge\.svg/g)].map((m) => m[0]);
+}
 function badgeImageUrl(text) {
-  return text.match(/https:\/\/github\.com\/[^)\s]+\/badge\.svg/)?.[0] ?? "";
+  const urls = badgeImageUrls(text);
+  return urls.find((u) => u.includes(WORKFLOW_FILE)) ?? urls[0] ?? "";
+}
+function badgeLinkUrls(text) {
+  return [...text.matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)]
+    .map((m) => m[1])
+    .filter((u) => !u.includes("badge.svg"));
 }
 function badgeLinkUrl(text) {
-  const urls = [...text.matchAll(/\]\((https:\/\/github\.com\/[^)]+\/actions\/workflows\/[^)]+)\)/g)].map((m) => m[1]);
-  return urls.find((u) => !u.includes("badge.svg")) ?? "";
+  const urls = badgeLinkUrls(text);
+  return urls.find((u) => u.includes(WORKFLOW_FILE)) ?? urls[0] ?? "";
 }
 function badgeIndex(text) {
   return text.indexOf("badge.svg");
@@ -77,6 +94,13 @@ function runChecks(readmeText) {
     "workflow_dispatch είναι ενεργό στο workflow",
     hasWorkflowTrigger(workflow, "workflow_dispatch"),
     "η γραμμή `workflow_dispatch:` στο triggers του hermes_ci_matrix_workflow.yml",
+  );
+
+  // 2α. Η σύνταξη Markdown του badge είναι αναλύσιμη ([![alt](εικόνα)](σύνδεσμος)).
+  check(
+    "η σύνταξη Markdown του badge είναι αναλύσιμη",
+    parseBadge(readmeText) !== null,
+    "η γραμμή του badge σε έγκυρη σύνταξη `[![alt](URL εικόνας badge.svg)](σύνδεσμος workflow)` — το στοιχείο badge δεν μπόρεσε να αναλυθεί",
   );
 
   // 3. Το URL εικόνας του badge δείχνει στο σωστό workflow αρχείο.
@@ -184,8 +208,6 @@ function resultByLabel(results, label) {
 }
 
 // Μεταλλαγές README για τα αρνητικά σενάρια.
-const BADGE_MARKDOWN_RE =
-  /\[!\[[^\]]*\]\((https:\/\/github\.com\/[^\s)]*badge\.svg[^)\s]*)\)\]\((https:\/\/github\.com\/[^)\s]+)\)/;
 function stripBadgeImage(text) {
   return text.replace(BADGE_MARKDOWN_RE, (_, img, link) => `[HERMES CI Matrix](${link})`);
 }
@@ -281,6 +303,58 @@ check(
   "αρνητικό: τα μηνύματα αποτυχίας για λάθος URL εικόνας και λάθος σύνδεσμο είναι διακριτά",
   realImageHint !== realLinkHint && !realLinkHint.includes("badge.svg") && realImageHint.includes("badge.svg"),
   "διακριτά μηνύματα: το μήνυμα εικόνας αναφέρει badge.svg, το μήνυμα συνδέσμου όχι",
+);
+
+// Στ. README με περισσότερα από ένα badge: οι έλεγχοι εντοπίζουν το σωστό workflow badge.
+const SHIELDS_BADGE =
+  "[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)\n";
+const OTHER_WORKFLOW_BADGE =
+  "[![Other CI](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml)\n";
+function positive(label, mutatedReadme) {
+  const results = runChecks(mutatedReadme);
+  const failed = results.filter((r) => !r.ok);
+  check(
+    label,
+    failed.length === 0,
+    failed.length ? `οι έλεγχοι που απέτυχαν άδικα: ${failed.map((f) => f.label).join(", ")}` : "",
+  );
+}
+positive(
+  "πολλαπλά badge: εξωτερικό badge (shields.io) πριν από το workflow badge δεν μπερδεύει τους ελέγχους",
+  SHIELDS_BADGE + readme,
+);
+positive(
+  "πολλαπλά badge: badge άλλου workflow πριν από το σωστό δεν μπερδεύει τους ελέγχους",
+  OTHER_WORKFLOW_BADGE + readme,
+);
+
+// Ζ. Κακοσχηματισμένη σύνταξη Markdown στο badge: αποτυχία στον έλεγχο σύνταξης
+// με μήνυμα που κατονομάζει το στοιχείο badge που δεν μπόρεσε να αναλυθεί.
+const PARSE_CHECK_LABEL = "η σύνταξη Markdown του badge είναι αναλύσιμη";
+function breakImageParens(text) {
+  // Λείπει το `)]` που κλείνει την εικόνα: [![alt](img](link)
+  return text.replace(BADGE_MARKDOWN_RE, (_, img, link) => `[![HERMES CI Matrix](${img}](${link})`);
+}
+function breakLinkParens(text) {
+  // Λείπει η τελική `)` του συνδέσμου: [![alt](img)](link
+  return text.replace(BADGE_MARKDOWN_RE, (_, img, link) => `[![HERMES CI Matrix](${img})](${link}`);
+}
+function assertParseFailure(results) {
+  const parse = resultByLabel(results, PARSE_CHECK_LABEL);
+  if (!parse || parse.ok) return "ο έλεγχος σύνταξης δεν απέτυχε παρότι η σύνταξη Markdown του badge είναι κακοσχηματισμένη";
+  if (!/badge/.test(parse.hint)) return "το μήνυμα αποτυχίας δεν κατονομάζει το στοιχείο badge που δεν αναλύεται";
+  if (!/σύνταξη|αναλυθεί/.test(parse.hint)) return "το μήνυμα αποτυχίας δεν εξηγεί ότι η σύνταξη του badge δεν μπόρεσε να αναλυθεί";
+  return true;
+}
+negative(
+  "αρνητικό: κακοσχηματισμένη σύνταξη εικόνας badge (λείπει `)]`) αποτυγχάνει με μήνυμα που κατονομάζει το badge",
+  breakImageParens(readme),
+  ({ results }) => assertParseFailure(results),
+);
+negative(
+  "αρνητικό: κακοσχηματισμένη σύνταξη συνδέσμου badge (λείπει τελική `)`) αποτυγχάνει με μήνυμα που κατονομάζει το badge",
+  breakLinkParens(readme),
+  ({ results }) => assertParseFailure(results),
 );
 
 if (failures > 0) {
