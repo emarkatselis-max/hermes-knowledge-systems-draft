@@ -1,0 +1,201 @@
+name: HERMES CI Multi-OS CLI Matrix & Path Normalization Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-workflows:
+    name: Lint & Security Audit GitHub Actions Workflows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Security Audit for SHA Pinning & Minimal Permissions
+        shell: bash
+        run: |
+          node test_workflow_security_audit.js
+
+      - name: Download & Run actionlint
+        shell: bash
+        run: |
+          mkdir -p bin
+          curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- 1.7.7 bin
+          ./bin/actionlint -color
+
+  validate-cli-cross-platform:
+    name: CLI Matrix (${{ matrix.os }})
+    needs: [lint-workflows]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [20.x, 22.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          mkdir -p test-results
+          npm ci || npm install ajv@^8.12.0
+
+      - name: Test Valid Artifact & Path Normalization
+        id: cli_valid
+        shell: bash
+        run: |
+          node validate_trend_artifact.js hermes_ci_sample_valid_v2.json --schema hermes_ci_benchmark_trend_schema_v2.json --format json > test-results/valid_output.json
+          cat test-results/valid_output.json | node -e '
+            let d = "";
+            process.stdin.on("data", c => d += c);
+            process.stdin.on("end", () => {
+              const res = JSON.parse(d);
+              if (res.exitCode !== 0 || !res.valid) process.exit(1);
+              if (res.schemaPath.includes("\\")) throw new Error("schemaPath contains backslashes: " + res.schemaPath);
+              if (res.source.includes("\\")) throw new Error("source contains backslashes: " + res.source);
+            });
+          '
+
+      - name: Test Invalid Artifact & RFC 6901 Escaping
+        id: cli_rfc6901
+        shell: bash
+        run: |
+          node -e '
+            const assert = require("assert");
+            const Ajv = require("ajv");
+            const { formatValidationError } = require("./validate_trend_artifact.js");
+
+            const ajv = new Ajv({ strict: false, allErrors: true });
+            const schema = {
+              type: "object",
+              properties: {
+                "metric/rate": { type: "number" },
+                "factor~ratio": { type: "number" }
+              }
+            };
+            const validate = ajv.compile(schema);
+            validate({ "metric/rate": "bad", "factor~ratio": "bad" });
+            const errs = validate.errors.map(formatValidationError);
+            assert.strictEqual(errs[0].path, "/metric~1rate");
+            assert.strictEqual(errs[1].path, "/factor~0ratio");
+            assert(!errs[0].path.includes("\\") && !errs[1].path.includes("\\"));
+            console.log("RFC 6901 escaping validated on: " + process.platform);
+          '
+
+      - name: Test Paths with Spaces, Unicode, and Special Characters
+        shell: bash
+        run: |
+          UNICODE_DIR="test-results/HERMES δοκιμές & αναφορές (v2.0)"
+          mkdir -p "$UNICODE_DIR"
+          cp hermes_ci_sample_invalid_v2.json "$UNICODE_DIR/έκθεση_τάσης #1.json"
+          cp hermes_ci_benchmark_trend_schema_v2.json "$UNICODE_DIR/σχήμα_v2 [official].json"
+
+          set +e
+          node validate_trend_artifact.js "$UNICODE_DIR/έκθεση_τάσης #1.json" --schema "$UNICODE_DIR/σχήμα_v2 [official].json" --format json > test-results/unicode_paths_output.json
+          U_STATUS=$?
+          set -e
+
+          if [ $U_STATUS -ne 1 ]; then
+            echo "Expected exit code 1 on invalid unicode file, got $U_STATUS"
+            exit 1
+          fi
+
+          cat test-results/unicode_paths_output.json | node -e '
+            let d = "";
+            process.stdin.on("data", c => d += c);
+            process.stdin.on("end", () => {
+              const res = JSON.parse(d);
+              if (res.schemaPath.includes("\\") || res.source.includes("\\")) throw new Error("Unicode paths contain backslashes");
+              for (const err of res.errors) {
+                if (err.path.includes("\\")) throw new Error("Unicode error pointer contains backslashes: " + err.path);
+              }
+            });
+          '
+
+      - name: Record Environment & Test Summary
+        if: always()
+        shell: bash
+        run: |
+          node -e '
+            const fs = require("fs");
+            const summary = {
+              os: "${{ matrix.os }}",
+              nodeVersion: "${{ matrix.node-version }}",
+              runnerPlatform: process.platform,
+              runnerArch: process.arch,
+              outcome: "${{ job.status }}",
+              completedAt: new Date().toISOString()
+            };
+            fs.writeFileSync("test-results/environment_summary.json", JSON.stringify(summary, null, 2));
+          '
+
+      - name: Generate Job Step Summary
+        if: always()
+        shell: bash
+        run: |
+          cat << 'SUMMARY_EOF' >> $GITHUB_STEP_SUMMARY
+          ### 📊 HERMES CLI Matrix Test Result (${{ matrix.os }} / Node ${{ matrix.node-version }})
+          - **Runner OS:** `${{ matrix.os }}` (`${{ runner.os }}`)
+          - **Node Version:** `${{ matrix.node-version }}`
+          - **Status:** ${{ job.status == 'success' && '✅ SUCCESS' || '❌ FAILURE' }}
+          - **Artifact Name:** `cli-matrix-results-${{ matrix.os }}-node${{ matrix.node-version }}`
+          - **Direct Artifact Download:** [Browse Artifacts](../../actions/runs/${{ github.run_id }})
+          SUMMARY_EOF
+
+      - name: Upload Test Results & Failure Artifacts
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        if: always()
+        with:
+          name: cli-matrix-results-${{ matrix.os }}-node${{ matrix.node-version }}
+          path: test-results/
+          retention-days: 14
+
+  matrix-summary:
+    name: Cross-Platform Matrix Summary
+    needs: [validate-cli-cross-platform]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Publish Consolidated Matrix Summary
+        run: |
+          cat << 'REPORT_EOF' >> $GITHUB_STEP_SUMMARY
+          ## 🌐 HERMES CI Multi-OS Matrix Run Overview
+
+          | Operating System | Matrix Status | Artifact Name | Download Link |
+          |:-----------------|:-------------:|:--------------|:--------------|
+          | **Ubuntu (Linux)** | ${{ contains(needs.validate-cli-cross-platform.result, 'failure') && '⚠️ Check logs' || (contains(needs.validate-cli-cross-platform.result, 'cancelled') && '⛔ CANCELLED' || '✅ PASS') }} | `cli-matrix-results-ubuntu-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
+          | **Windows** | ${{ contains(needs.validate-cli-cross-platform.result, 'failure') && '⚠️ Check logs' || (contains(needs.validate-cli-cross-platform.result, 'cancelled') && '⛔ CANCELLED' || '✅ PASS') }} | `cli-matrix-results-windows-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
+          | **macOS** | ${{ contains(needs.validate-cli-cross-platform.result, 'failure') && '⚠️ Check logs' || (contains(needs.validate-cli-cross-platform.result, 'cancelled') && '⛔ CANCELLED' || '✅ PASS') }} | `cli-matrix-results-macos-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
+
+          *Summary generated automatically by HERMES CI Workflow even if individual matrix jobs fail.*
+          REPORT_EOF
+
+      - name: Evaluate Overall Matrix Status
+        if: contains(needs.validate-cli-cross-platform.result, 'failure') || contains(needs.validate-cli-cross-platform.result, 'cancelled')
+        run: |
+          echo "::error::One or more cross-platform matrix jobs failed or were cancelled. Marking workflow run as failed."
+          exit 1
