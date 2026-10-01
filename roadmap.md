@@ -6,3 +6,4 @@
 - [x] Βήμα στο workflow που τρέχει τις δοκιμές σε κάθε pull request
 - [x] Δοκιμή: README αναφέρει main + Cross-Platform Matrix Summary ως required check
 - [x] Εκτέλεση δοκιμών και τελικός έλεγχος
+- [x] Εργαλείο ελέγχου badge README με AI (/ergaleia/elegxos-readme) + δοκιμές fenced code

@@ -138,3 +138,20 @@ export const draftChecks = [
   "Κατάσταση εκκαθάρισης: προς τελικό έλεγχο στο Γ.Ε.ΜΗ.· δεν δηλώνεται πρόσφατα ελεγμένη κατάσταση.",
   "Χώρος εταιρικών δημοσιεύσεων: δεν έχουν αναρτηθεί έγγραφα στην παρούσα δοκιμαστική έκδοση.",
 ];
+
+export const badgeTool = {
+  eyebrow: "ΕΡΓΑΛΕΙΟ ΣΥΝΤΗΡΗΤΩΝ",
+  title: "Έλεγχος badge στο README",
+  lead: "Επικολλήστε ένα README σε Markdown για να εντοπιστούν badge GitHub Actions με αμφίσημη ή κακοσχηματισμένη σύνταξη, με εξήγηση από AI.",
+  inputLabel: "Κείμενο README (Markdown)",
+  placeholder: "[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)",
+  submit: "Ανάλυση με AI",
+  busy: "Ανάλυση…",
+  localTitle: "Τοπικός εντοπισμός (εκτός code blocks)",
+  localCount: (n: number) =>
+    n === 0 ? "Δεν εντοπίστηκε workflow badge εκτός code blocks." : `Εντοπίστηκαν ${n} badge εκτός code blocks.`,
+  aiTitle: "Εξήγηση AI",
+  noIssues: "Δεν εντοπίστηκαν προβλήματα στα badge.",
+  severity: { error: "ΣΦΑΛΜΑ", warning: "ΠΡΟΕΙΔΟΠΟΙΗΣΗ", info: "ΠΛΗΡΟΦΟΡΙΑ" } as const,
+  note: "Το κείμενο αποστέλλεται για ανάλυση μόνο όταν πατήσετε «Ανάλυση με AI» και δεν αποθηκεύεται από την εφαρμογή. Η σελίδα δεν προστατεύεται με κωδικό· πριν από δημόσια δημοσίευση πρέπει να περιοριστεί η πρόσβαση, καθώς κάθε ανάλυση καταναλώνει μονάδες AI.",
+};
