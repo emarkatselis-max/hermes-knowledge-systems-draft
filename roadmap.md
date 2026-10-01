@@ -7,3 +7,5 @@
 - [x] Δοκιμή: README αναφέρει main + Cross-Platform Matrix Summary ως required check
 - [x] Εκτέλεση δοκιμών και τελικός έλεγχος
 - [x] Εργαλείο ελέγχου badge README με AI (/ergaleia/elegxos-readme) + δοκιμές fenced code
+- [ ] Κωδικός συντηρητών (MAINTAINER_PASSWORD) — αναμένεται από τον χρήστη
+- [ ] Σύνδεση GitHub + αντικατάσταση OWNER/REPO — αναμένεται σύνδεση από τον χρήστη

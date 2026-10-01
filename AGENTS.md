@@ -9,3 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - Badge parsing lives in src/lib/readme-badges.js (plain JS) so the app and node tests share one implementation.
+- Maintainer tool access uses a shared password secret plus an HMAC-signed httpOnly cookie (no database), checked inside every protected server function.
