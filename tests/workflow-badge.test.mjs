@@ -208,8 +208,6 @@ function resultByLabel(results, label) {
 }
 
 // Μεταλλαγές README για τα αρνητικά σενάρια.
-const BADGE_MARKDOWN_RE =
-  /\[!\[[^\]]*\]\((https:\/\/github\.com\/[^\s)]*badge\.svg[^)\s]*)\)\]\((https:\/\/github\.com\/[^)\s]+)\)/;
 function stripBadgeImage(text) {
   return text.replace(BADGE_MARKDOWN_RE, (_, img, link) => `[HERMES CI Matrix](${link})`);
 }
