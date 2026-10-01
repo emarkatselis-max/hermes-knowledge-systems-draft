@@ -96,6 +96,13 @@ function runChecks(readmeText) {
     "η γραμμή `workflow_dispatch:` στο triggers του hermes_ci_matrix_workflow.yml",
   );
 
+  // 2α. Η σύνταξη Markdown του badge είναι αναλύσιμη ([![alt](εικόνα)](σύνδεσμος)).
+  check(
+    "η σύνταξη Markdown του badge είναι αναλύσιμη",
+    parseBadge(readmeText) !== null,
+    "η γραμμή του badge σε έγκυρη σύνταξη `[![alt](URL εικόνας badge.svg)](σύνδεσμος workflow)` — το στοιχείο badge δεν μπόρεσε να αναλυθεί",
+  );
+
   // 3. Το URL εικόνας του badge δείχνει στο σωστό workflow αρχείο.
   check(
     "το URL εικόνας του badge δείχνει στο hermes_ci_matrix_workflow.yml",
