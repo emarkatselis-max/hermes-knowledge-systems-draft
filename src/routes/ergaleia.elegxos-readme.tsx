@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader, Section, Note } from "@/components/site/Page";
-import { analyzeReadmeBadges } from "@/lib/badge-ai.functions";
+import { analyzeReadmeBadges, maintainerLogin, maintainerLogout, maintainerStatus } from "@/lib/badge-ai.functions";
 import { findWorkflowBadges } from "@/lib/readme-badges.js";
 import { badgeTool } from "@/data/site";
 
