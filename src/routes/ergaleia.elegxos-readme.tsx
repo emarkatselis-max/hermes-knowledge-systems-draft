@@ -150,6 +150,9 @@ function BadgeTool({ onLogout }: { onLogout: () => void }) {
             <p className="text-sm text-muted-foreground" aria-live="polite">
               {badgeTool.localCount(local.length)}
             </p>
+            <button type="button" onClick={onLogout} className="focus-ring ml-auto text-sm text-accent underline">
+              {badgeTool.signOut}
+            </button>
           </div>
         </form>
 
