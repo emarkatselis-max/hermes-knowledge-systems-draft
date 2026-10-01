@@ -29,6 +29,11 @@ jobs:
         run: |
           node test_workflow_security_audit.js
 
+      - name: Verify workflow_dispatch trigger & README badge/tests
+        shell: bash
+        run: |
+          node tests/workflow-badge.test.mjs
+
       - name: Download & Run actionlint
         shell: bash
         run: |
