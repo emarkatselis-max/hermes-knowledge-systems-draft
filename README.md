@@ -1,3 +1,6 @@
+<!-- Αντικαταστήστε OWNER/REPO με το πραγματικό αποθετήριο GitHub μετά τη σύνδεση. -->
+[![HERMES CI Matrix](https://github.com/OWNER/REPO/actions/workflows/hermes_ci_matrix_workflow.yml/badge.svg?branch=main)](https://github.com/OWNER/REPO/actions/workflows/hermes_ci_matrix_workflow.yml)
+
 # Welcome to your Lovable project
 
 This project was built with [Lovable](https://lovable.dev).
