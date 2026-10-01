@@ -165,7 +165,7 @@ function runChecks(readmeText) {
   );
 
   // 14. Κάθε μήνυμα αποτυχίας κατονομάζει το συγκεκριμένο στοιχείο ή σημείωση που λείπει.
-  for (const { label, hint } of results) {
+  for (const { label, hint } of [...results]) {
     const hasSpecificHint = typeof hint === "string" && hint.trim().length > 0;
     check(
       `το μήνυμα αποτυχίας της δοκιμής «${label}» κατονομάζει το συγκεκριμένο στοιχείο`,
