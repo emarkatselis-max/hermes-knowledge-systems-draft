@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader, Section, Note } from "@/components/site/Page";
-import { analyzeReadmeBadges } from "@/lib/badge-ai.functions";
+import { analyzeReadmeBadges, maintainerLogin, maintainerLogout, maintainerStatus } from "@/lib/badge-ai.functions";
 import { findWorkflowBadges } from "@/lib/readme-badges.js";
 import { badgeTool } from "@/data/site";
 
@@ -15,12 +15,93 @@ export const Route = createFileRoute("/ergaleia/elegxos-readme")({
       { property: "og:description", content: badgeTool.lead },
     ],
   }),
-  component: BadgeTool,
+  component: Gate,
 });
 
 type Result = Awaited<ReturnType<typeof analyzeReadmeBadges>>;
 
-function BadgeTool() {
+function Gate() {
+  const status = useServerFn(maintainerStatus);
+  const login = useServerFn(maintainerLogin);
+  const logout = useServerFn(maintainerLogout);
+  const [state, setState] = useState<{ configured: boolean; signedIn: boolean } | null>(null);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    status().then(setState).catch(() => setState({ configured: false, signedIn: false }));
+  }, [status]);
+
+  async function onLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const r = await login({ data: { password } });
+      if (r.ok) {
+        setPassword("");
+        setState({ configured: true, signedIn: true });
+      } else setError(r.error);
+    } catch {
+      setError("Η σύνδεση απέτυχε.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (state?.signedIn) {
+    return (
+      <BadgeTool
+        onLogout={async () => {
+          await logout();
+          setState({ configured: true, signedIn: false });
+        }}
+      />
+    );
+  }
+
+  return (
+    <>
+      <PageHeader eyebrow={badgeTool.eyebrow} title={badgeTool.title} lead={badgeTool.loginLead} />
+      <Section>
+        {state === null ? (
+          <p className="text-muted-foreground">{badgeTool.checking}</p>
+        ) : !state.configured ? (
+          <Note>{badgeTool.notConfigured}</Note>
+        ) : (
+          <form onSubmit={onLogin} className="max-w-sm space-y-4">
+            <label htmlFor="pw" className="block font-serif text-lg text-foreground">
+              {badgeTool.passwordLabel}
+            </label>
+            <input
+              id="pw"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="focus-ring w-full rounded-md border border-border bg-card p-3 text-foreground"
+            />
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={busy || !password}
+              className="focus-ring rounded-md bg-primary px-5 py-2.5 text-sm text-primary-foreground disabled:opacity-50"
+            >
+              {busy ? badgeTool.signingIn : badgeTool.signIn}
+            </button>
+          </form>
+        )}
+      </Section>
+    </>
+  );
+}
+
+function BadgeTool({ onLogout }: { onLogout: () => void }) {
   const analyze = useServerFn(analyzeReadmeBadges);
   const [readme, setReadme] = useState("");
   const [busy, setBusy] = useState(false);
@@ -69,6 +150,9 @@ function BadgeTool() {
             <p className="text-sm text-muted-foreground" aria-live="polite">
               {badgeTool.localCount(local.length)}
             </p>
+            <button type="button" onClick={onLogout} className="focus-ring ml-auto text-sm text-accent underline">
+              {badgeTool.signOut}
+            </button>
           </div>
         </form>
 
