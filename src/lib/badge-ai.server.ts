@@ -34,16 +34,16 @@ function parseJson(text: string): { summary: string; issues: BadgeIssue[] } {
   const end = text.lastIndexOf("}");
   try {
     const obj = JSON.parse(text.slice(start, end + 1));
-    const issues: BadgeIssue[] = Array.isArray(obj.issues)
-      ? obj.issues.slice(0, 8).map((i: Record<string, unknown>) => ({
-          line: typeof i.line === "number" ? i.line : null,
-          severity: i.severity === "error" || i.severity === "info" ? i.severity : "warning",
-          title: String(i.title ?? ""),
-          explanation: String(i.explanation ?? ""),
-          suggestion: String(i.suggestion ?? ""),
+    const issues: BadgeIssue[] = Array.isArray(obj["issues"])
+      ? obj["issues"].slice(0, 8).map((i: Record<string, unknown>) => ({
+          line: typeof i["line"] === "number" ? i["line"] : null,
+          severity: i["severity"] === "error" || i["severity"] === "info" ? i["severity"] : "warning",
+          title: String(i["title"] ?? ""),
+          explanation: String(i["explanation"] ?? ""),
+          suggestion: String(i["suggestion"] ?? ""),
         }))
       : [];
-    return { summary: String(obj.summary ?? ""), issues };
+    return { summary: String(obj["summary"] ?? ""), issues };
   } catch {
     return { summary: text.trim().slice(0, 600), issues: [] };
   }
