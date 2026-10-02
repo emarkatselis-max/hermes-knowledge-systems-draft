@@ -8,6 +8,7 @@ import { maskFencedCodeBlocks, findWorkflowBadges } from "../src/lib/readme-badg
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const WORKFLOW_PATH = ".github/workflows/hermes_ci_matrix_workflow.yml";
 const WORKFLOW_FILE = "hermes_ci_matrix_workflow.yml";
+const REPO = "emarkatselis-max/hermes-knowledge-systems-draft";
 
 // Επαναχρησιμοποιήσιμες συναρτήσεις ανάγνωσης αρχείων.
 function fileExists(relPath) {
@@ -295,7 +296,7 @@ check(
 const SHIELDS_BADGE =
   "[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)\n";
 const OTHER_WORKFLOW_BADGE =
-  "[![Other CI](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml)\n";
+  "[![Other CI](https://github.com/someone/other/actions/workflows/other_workflow.yml/badge.svg)](https://github.com/someone/other/actions/workflows/other_workflow.yml)\n";
 function positive(label, mutatedReadme) {
   const results = runChecks(mutatedReadme);
   const failed = results.filter((r) => !r.ok);
