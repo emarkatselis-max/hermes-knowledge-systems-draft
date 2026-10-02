@@ -197,15 +197,15 @@ jobs:
 
           | Operating System | Matrix Status | Artifact Name | Download Link |
           |:-----------------|:-------------:|:--------------|:--------------|
-          | **Ubuntu (Linux)** | ${{ contains(needs.validate-cli-cross-platform.result, 'failure') && '⚠️ Check logs' || (contains(needs.validate-cli-cross-platform.result, 'cancelled') && '⛔ CANCELLED' || '✅ PASS') }} | `cli-matrix-results-ubuntu-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
-          | **Windows** | ${{ contains(needs.validate-cli-cross-platform.result, 'failure') && '⚠️ Check logs' || (contains(needs.validate-cli-cross-platform.result, 'cancelled') && '⛔ CANCELLED' || '✅ PASS') }} | `cli-matrix-results-windows-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
-          | **macOS** | ${{ contains(needs.validate-cli-cross-platform.result, 'failure') && '⚠️ Check logs' || (contains(needs.validate-cli-cross-platform.result, 'cancelled') && '⛔ CANCELLED' || '✅ PASS') }} | `cli-matrix-results-macos-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
+          | **Ubuntu (Linux)** | ${{ needs.validate-cli-cross-platform.result == 'success' && '✅ PASS' || (needs.validate-cli-cross-platform.result == 'skipped' && '⏭️ SKIPPED (lint failed)' || (needs.validate-cli-cross-platform.result == 'cancelled' && '⛔ CANCELLED' || '❌ FAILED')) }} | `cli-matrix-results-ubuntu-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
+          | **Windows** | ${{ needs.validate-cli-cross-platform.result == 'success' && '✅ PASS' || (needs.validate-cli-cross-platform.result == 'skipped' && '⏭️ SKIPPED (lint failed)' || (needs.validate-cli-cross-platform.result == 'cancelled' && '⛔ CANCELLED' || '❌ FAILED')) }} | `cli-matrix-results-windows-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
+          | **macOS** | ${{ needs.validate-cli-cross-platform.result == 'success' && '✅ PASS' || (needs.validate-cli-cross-platform.result == 'skipped' && '⏭️ SKIPPED (lint failed)' || (needs.validate-cli-cross-platform.result == 'cancelled' && '⛔ CANCELLED' || '❌ FAILED')) }} | `cli-matrix-results-macos-latest-*` | [Run Artifacts](../../actions/runs/${{ github.run_id }}) |
 
           *Summary generated automatically by HERMES CI Workflow even if individual matrix jobs fail.*
           REPORT_EOF
 
       - name: Evaluate Overall Matrix Status
-        if: contains(needs.validate-cli-cross-platform.result, 'failure') || contains(needs.validate-cli-cross-platform.result, 'cancelled')
+        if: needs.validate-cli-cross-platform.result != 'success'
         run: |
-          echo "::error::One or more cross-platform matrix jobs failed or were cancelled. Marking workflow run as failed."
+          echo "::error::One or more cross-platform matrix jobs did not succeed (failed, cancelled or skipped because lint failed). Marking workflow run as failed."
           exit 1
