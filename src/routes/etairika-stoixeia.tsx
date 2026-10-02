@@ -62,7 +62,7 @@ function EtairikaStoixeia() {
         </dl>
       </Section>
 
-      <Section title="Περιοχή ελέγχου προσχεδίου" className="border-t border-border">
+      <Section title="Σημειώσεις εταιρικής παρουσίασης" className="border-t border-border">
         <ul className="space-y-3">
           {draftChecks.map((c) => (
             <li
