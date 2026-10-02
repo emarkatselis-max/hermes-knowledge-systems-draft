@@ -27,6 +27,7 @@ export default defineConfig({
     prerender: {
       enabled: true,
       crawlLinks: false,
+      autoSubfolderIndex: false,
     },
   },
   nitro: {
