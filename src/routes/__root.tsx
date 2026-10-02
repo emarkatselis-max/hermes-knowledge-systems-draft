@@ -79,8 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "robots", content: "noindex,nofollow" },
-      { name: "googlebot", content: "noindex,nofollow" },
+      { name: "robots", content: "index,follow" },
       { title: "HERMES KNOWLEDGE SYSTEMS — Προσχέδιο" },
       { property: "og:site_name", content: "HERMES KNOWLEDGE SYSTEMS" },
       { property: "og:type", content: "website" },
