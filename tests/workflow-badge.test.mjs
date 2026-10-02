@@ -8,6 +8,7 @@ import { maskFencedCodeBlocks, findWorkflowBadges } from "../src/lib/readme-badg
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const WORKFLOW_PATH = ".github/workflows/hermes_ci_matrix_workflow.yml";
 const WORKFLOW_FILE = "hermes_ci_matrix_workflow.yml";
+const REPO = "emarkatselis-max/hermes-knowledge-systems-draft";
 
 // Επαναχρησιμοποιήσιμες συναρτήσεις ανάγνωσης αρχείων.
 function fileExists(relPath) {
@@ -155,38 +156,23 @@ function runChecks(readmeText) {
     "η αναφορά στο «Cross-Platform Matrix Summary» στις οδηγίες του README",
   );
 
-  // 10. Το README επισημαίνει το OWNER/REPO ως προσωρινό placeholder.
+  // 10. Το URL εικόνας του badge δείχνει στο πραγματικό αποθετήριο.
   check(
-    "το README επισημαίνει το OWNER/REPO ως προσωρινό placeholder",
-    mentionsTemporaryPlaceholderNote(readmeText),
-    "η σημείωση «Σημείωση: Το `OWNER/REPO` στο badge είναι προσωρινό …» κάτω από το badge",
+    `το URL εικόνας του badge δείχνει στο αποθετήριο ${REPO}`,
+    badgeImageUrl(readmeText) === `https://github.com/${REPO}/actions/workflows/${WORKFLOW_FILE}/badge.svg`,
+    `το URL εικόνας \`https://github.com/${REPO}/actions/workflows/${WORKFLOW_FILE}/badge.svg\``,
   );
-
-  // 11. Το README εξηγεί ότι το placeholder πρέπει να αντικατασταθεί με την πραγματική διαδρομή αποθετηρίου.
+  // 11. Ο σύνδεσμος του badge δείχνει στο πραγματικό αποθετήριο.
   check(
-    "το README εξηγεί την αντικατάσταση του placeholder με την πραγματική διαδρομή",
-    mentionsReplacementWithRealPath(readmeText),
-    "η εξήγηση «πρέπει να αντικατασταθεί με το πραγματικό μονοπάτι αποθετηρίου» στη σημείωση",
+    `ο σύνδεσμος του badge δείχνει στο αποθετήριο ${REPO}`,
+    badgeLinkUrl(readmeText) === `https://github.com/${REPO}/actions/workflows/${WORKFLOW_FILE}`,
+    `ο σύνδεσμος \`https://github.com/${REPO}/actions/workflows/${WORKFLOW_FILE}\``,
   );
-
-  // 12. Το ίδιο το badge κρατά το OWNER/REPO ως προσωρινό placeholder (εικόνα + σύνδεσμος).
+  // 12. Δεν έχει απομείνει το προσωρινό OWNER/REPO στο README.
   check(
-    "το badge κρατά το OWNER/REPO ως placeholder στο URL της εικόνας",
-    hasPlaceholderIn(badgeImageUrl(readmeText)) &&
-      badgeImageUrl(readmeText).includes(`/actions/workflows/${WORKFLOW_FILE}/badge.svg`),
-    "το URL εικόνας του badge με `OWNER/REPO` (https://github.com/OWNER/REPO/actions/workflows/…/badge.svg)",
-  );
-  check(
-    "το badge κρατά το OWNER/REPO ως placeholder στον σύνδεσμό του",
-    hasPlaceholderIn(badgeLinkUrl(readmeText)) && badgeLinkUrl(readmeText).includes(`/actions/workflows/${WORKFLOW_FILE}`),
-    "ο σύνδεσμος του badge με `OWNER/REPO` (https://github.com/OWNER/REPO/actions/workflows/hermes_ci_matrix_workflow.yml)",
-  );
-
-  // 13. Υπάρχει σχόλιο-υπόδειξη στο README για την αντικατάσταση του placeholder.
-  check(
-    "το README έχει σχόλιο-υπόδειξη για αντικατάσταση του OWNER/REPO",
-    hasPlaceholderComment(readmeText),
-    "το σχόλιο `<!-- Αντικαταστήστε OWNER/REPO με το πραγματικό μονοπάτι αποθετηρίου … -->` πάνω από το badge",
+    "το README δεν περιέχει πλέον το προσωρινό OWNER/REPO",
+    !hasPlaceholderIn(maskFencedCodeBlocks(readmeText)),
+    "αντικατάσταση κάθε `OWNER/REPO` εκτός code blocks με το πραγματικό αποθετήριο",
   );
 
   // 14. Κάθε μήνυμα αποτυχίας κατονομάζει το συγκεκριμένο στοιχείο ή σημείωση που λείπει.
@@ -310,7 +296,7 @@ check(
 const SHIELDS_BADGE =
   "[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)\n";
 const OTHER_WORKFLOW_BADGE =
-  "[![Other CI](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/other_workflow.yml)\n";
+  "[![Other CI](https://github.com/someone/other/actions/workflows/other_workflow.yml/badge.svg)](https://github.com/someone/other/actions/workflows/other_workflow.yml)\n";
 function positive(label, mutatedReadme) {
   const results = runChecks(mutatedReadme);
   const failed = results.filter((r) => !r.ok);

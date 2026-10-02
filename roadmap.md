@@ -8,4 +8,4 @@
 - [x] Εκτέλεση δοκιμών και τελικός έλεγχος
 - [x] Εργαλείο ελέγχου badge README με AI (/ergaleia/elegxos-readme) + δοκιμές fenced code
 - [x] Κωδικός συντηρητών ορίστηκε
-- [ ] Σύνδεση GitHub + αντικατάσταση OWNER/REPO — αναμένεται σύνδεση από τον χρήστη
+- [x] Σύνδεση GitHub (emarkatselis-max/hermes-knowledge-systems-draft) + badge στο πραγματικό αποθετήριο
