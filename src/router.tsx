@@ -13,6 +13,9 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     ...(base ? { basepath: base } : {}),
+    // GitHub Pages serves directories with a trailing slash; avoid a 307
+    // redirect so prerendering works even with redirects disabled.
+    trailingSlash: "preserve",
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
   });
