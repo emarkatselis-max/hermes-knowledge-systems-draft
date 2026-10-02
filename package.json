@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "build:pages": "vite build --config vite.config.pages.ts",
+    "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
