@@ -1,6 +1,6 @@
 # Static build of the HERMES draft site, deployed to GitHub Pages.
 # NOTE: the first run requires the user to enable Pages once in the repo:
-# Settings → Pages → Build and deployment → Source: GitHub Actions.
+# Settings → Pages → Build and deployment → Source: GitHub Actions (enabled 2026-10-02).
 name: Deploy GitHub Pages
 
 on:
