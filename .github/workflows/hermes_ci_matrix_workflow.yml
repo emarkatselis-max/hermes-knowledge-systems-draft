@@ -89,7 +89,7 @@ jobs:
               if (res.schemaPath.includes("\\")) throw new Error("schemaPath contains backslashes: " + res.schemaPath);
               if (res.source.includes("\\")) throw new Error("source contains backslashes: " + res.source);
             });
-          '
+          ' < test-results/valid_output.json
 
       - name: Test Invalid Artifact & RFC 6901 Escaping
         if: hashFiles('validate_trend_artifact.js') != ''
@@ -147,7 +147,7 @@ jobs:
                 if (err.path.includes("\\")) throw new Error("Unicode error pointer contains backslashes: " + err.path);
               }
             });
-          '
+          ' < test-results/unicode_paths_output.json
 
       - name: Record Environment & Test Summary
         if: always()
