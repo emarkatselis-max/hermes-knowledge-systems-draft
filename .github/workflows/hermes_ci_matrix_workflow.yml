@@ -80,7 +80,7 @@ jobs:
         shell: bash
         run: |
           node validate_trend_artifact.js hermes_ci_sample_valid_v2.json --schema hermes_ci_benchmark_trend_schema_v2.json --format json > test-results/valid_output.json
-          cat test-results/valid_output.json | node -e '
+          node -e '
             let d = "";
             process.stdin.on("data", c => d += c);
             process.stdin.on("end", () => {
@@ -137,7 +137,7 @@ jobs:
             exit 1
           fi
 
-          cat test-results/unicode_paths_output.json | node -e '
+          node -e '
             let d = "";
             process.stdin.on("data", c => d += c);
             process.stdin.on("end", () => {
