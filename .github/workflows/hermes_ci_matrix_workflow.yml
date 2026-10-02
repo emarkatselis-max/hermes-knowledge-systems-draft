@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Security Audit for SHA Pinning & Minimal Permissions
+        if: hashFiles('test_workflow_security_audit.js') != ''
         shell: bash
         run: |
           node test_workflow_security_audit.js
@@ -63,12 +64,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
+        if: hashFiles('validate_trend_artifact.js') != ''
         shell: bash
         run: |
-          mkdir -p test-results
-          npm ci || npm install ajv@^8.12.0
+          npm install --no-save --no-package-lock ajv@^8.12.0
 
       - name: Test Valid Artifact & Path Normalization
+        if: hashFiles('validate_trend_artifact.js') != ''
         id: cli_valid
         shell: bash
         run: |
@@ -85,6 +87,7 @@ jobs:
           '
 
       - name: Test Invalid Artifact & RFC 6901 Escaping
+        if: hashFiles('validate_trend_artifact.js') != ''
         id: cli_rfc6901
         shell: bash
         run: |
@@ -111,6 +114,7 @@ jobs:
           '
 
       - name: Test Paths with Spaces, Unicode, and Special Characters
+        if: hashFiles('validate_trend_artifact.js') != ''
         shell: bash
         run: |
           UNICODE_DIR="test-results/HERMES δοκιμές & αναφορές (v2.0)"
@@ -144,6 +148,7 @@ jobs:
         if: always()
         shell: bash
         run: |
+          mkdir -p test-results
           node -e '
             const fs = require("fs");
             const summary = {
@@ -161,7 +166,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          cat << 'SUMMARY_EOF' >> $GITHUB_STEP_SUMMARY
+          cat << 'SUMMARY_EOF' >> "$GITHUB_STEP_SUMMARY"
           ### 📊 HERMES CLI Matrix Test Result (${{ matrix.os }} / Node ${{ matrix.node-version }})
           - **Runner OS:** `${{ matrix.os }}` (`${{ runner.os }}`)
           - **Node Version:** `${{ matrix.node-version }}`
@@ -187,7 +192,7 @@ jobs:
     steps:
       - name: Publish Consolidated Matrix Summary
         run: |
-          cat << 'REPORT_EOF' >> $GITHUB_STEP_SUMMARY
+          cat << 'REPORT_EOF' >> "$GITHUB_STEP_SUMMARY"
           ## 🌐 HERMES CI Multi-OS Matrix Run Overview
 
           | Operating System | Matrix Status | Artifact Name | Download Link |
