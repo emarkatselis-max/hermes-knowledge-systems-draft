@@ -27,7 +27,8 @@ export default defineConfig({
     prerender: {
       enabled: true,
       crawlLinks: false,
-      autoSubfolderIndex: false,
+      // Only the explicit CONTENT_PAGES — never auto-discover the maintainer route.
+      autoStaticPathsDiscovery: false,
     },
   },
   nitro: {
