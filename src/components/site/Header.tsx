@@ -9,11 +9,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-      <div className="bg-primary text-primary-foreground">
-        <p className="mx-auto max-w-6xl px-5 py-1.5 text-center text-[0.7rem] tracking-[0.18em]">
-          {draftNotice}
-        </p>
-      </div>
+      {draftNotice && (
+        <div className="bg-primary text-primary-foreground">
+          <p className="mx-auto max-w-6xl px-5 py-1.5 text-center text-[0.7rem] tracking-[0.18em]">
+            {draftNotice}
+          </p>
+        </div>
+      )}
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-4">
         <Link to="/" className="rounded-sm focus-ring" aria-label="HERMES KNOWLEDGE SYSTEMS — Αρχική">
           <Wordmark compact />

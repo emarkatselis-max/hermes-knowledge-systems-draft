@@ -25,11 +25,11 @@ export function Footer() {
         </div>
 
         <div className="text-sm leading-relaxed text-muted-foreground">
-          <p>{draftNotice}</p>
+          {draftNotice && <p>{draftNotice}</p>}
           <p className="mt-3">© 2026 {company.short}</p>
           <p className="mt-3">
             <Link to="/aporrito" className="focus-ring underline underline-offset-4 hover:text-foreground">
-              Ιδιωτικότητα — προσχέδιο
+              Ιδιωτικότητα
             </Link>
           </p>
         </div>
