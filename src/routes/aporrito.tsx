@@ -4,13 +4,13 @@ import { PageHeader, Section, Note } from "@/components/site/Page";
 export const Route = createFileRoute("/aporrito")({
   head: () => ({
     meta: [
-      { title: "Ιδιωτικότητα — προσχέδιο | HERMES KNOWLEDGE SYSTEMS" },
+      { title: "Ιδιωτικότητα | HERMES KNOWLEDGE SYSTEMS" },
       {
         name: "description",
         content:
-          "Περιγραφή των λειτουργιών της παρούσας δοκιμαστικής έκδοσης ως προς τα δεδομένα των επισκεπτών.",
+          "Πώς ο ιστότοπος της HERMES KNOWLEDGE SYSTEMS αντιμετωπίζει τα δεδομένα των επισκεπτών.",
       },
-      { property: "og:title", content: "Ιδιωτικότητα — προσχέδιο" },
+      { property: "og:title", content: "Ιδιωτικότητα — HERMES KNOWLEDGE SYSTEMS" },
       {
         property: "og:description",
         content:
@@ -26,8 +26,8 @@ function Aporrito() {
     <>
       <PageHeader
         eyebrow="ΙΔΙΩΤΙΚΟΤΗΤΑ"
-        title="Ιδιωτικότητα — προσχέδιο"
-        lead="Η σελίδα περιγράφει μόνο όσα ισχύουν στην παρούσα δοκιμαστική έκδοση. Δεν αποτελεί τελικό κείμενο πολιτικής προστασίας δεδομένων."
+        title="Ιδιωτικότητα"
+        lead="Η σελίδα περιγράφει μόνο όσα ισχύουν σήμερα στον ιστότοπο ως προς τα δεδομένα των επισκεπτών."
       />
 
       <Section>
