@@ -13,7 +13,8 @@ export const Route = createFileRoute("/aporrito")({
       { property: "og:title", content: "Ιδιωτικότητα — προσχέδιο" },
       {
         property: "og:description",
-        content: "Καμία φόρμα, κανένα analytics στην παρούσα δοκιμαστική έκδοση.",
+        content:
+          "Καμία φόρμα ή εγγραφή· ανώνυμα στατιστικά επισκεψιμότητας μέσω της πλατφόρμας φιλοξενίας.",
       },
     ],
   }),
@@ -41,8 +42,9 @@ function Aporrito() {
           <div>
             <h2 className="font-serif text-xl text-foreground">Στατιστικά και ιχνηλάτες</h2>
             <p className="mt-3 leading-relaxed text-muted-foreground">
-              Δεν χρησιμοποιούνται εργαλεία στατιστικής ανάλυσης, διαφημιστικά cookies ή εξωτερικά
-              scripts παρακολούθησης.
+              Η πλατφόρμα φιλοξενίας συλλέγει ανώνυμα στατιστικά επισκεψιμότητας, τα οποία είναι
+              ενεργοποιημένα στο παρόν προσχέδιο. Δεν χρησιμοποιούνται διαφημιστικά cookies ή
+              εξωτερικά scripts παρακολούθησης.
             </p>
           </div>
           <div>
