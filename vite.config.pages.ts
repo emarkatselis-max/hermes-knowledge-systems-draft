@@ -20,6 +20,9 @@ export default defineConfig({
     base: GITHUB_PAGES_BASE,
   },
   tanstackStart: {
+    router: {
+      basepath: GITHUB_PAGES_BASE,
+    },
     pages: CONTENT_PAGES,
     prerender: {
       enabled: true,
